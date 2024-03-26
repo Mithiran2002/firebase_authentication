@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "823909917987",
+    "project_id": "practice-debfe",
+    "storage_bucket": "practice-debfe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823909917987:android:2144e96cf1ded8199b9896",
+        "android_client_info": {
+          "package_name": "com.example.firebase_authentication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAX8pkwDpNX1nQfIgOBkUGjzx_dJx5q6Sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
