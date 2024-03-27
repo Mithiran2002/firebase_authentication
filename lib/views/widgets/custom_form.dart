@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class CustomForm extends StatelessWidget {
   final String hintText;
-  final Function(String?)? validator;
+  final String? Function(String?)? validator;
   final TextEditingController controller;
   const CustomForm(
       {super.key,
@@ -14,7 +14,7 @@ class CustomForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      validator: (value) {},
+      validator: validator,
       controller: controller,
       decoration: InputDecoration(
           hintText: hintText,

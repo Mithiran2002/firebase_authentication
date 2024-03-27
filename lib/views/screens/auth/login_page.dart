@@ -2,7 +2,6 @@ import 'package:gap/gap.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 import 'package:firebase_authentication/views/widgets/custom_form.dart';
 import 'package:firebase_authentication/views/widgets/custom_button.dart';
@@ -15,18 +14,17 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var formKey = GlobalKey<FormState>();
+  bool isLoading = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
-  Future<void> authData() async {
+
+  Future<void> loginwithEmail() async {
     try {
-      UserCredential _userData = await FirebaseAuth.instance
+      UserCredential userData = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: emailController.text.trim(),
               password: passController.text.trim());
-      if (_userData.credential!.accessToken!.isNotEmpty) {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => HomeScreen()));
-      }
+      if (userData.credential!.accessToken!.isNotEmpty) {}
     } on FirebaseAuthException catch (e) {
       if (e.code == "weak-password") {
         print('The password provided is too weak.');
@@ -38,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  @override
   void initState() {
     super.initState();
     emailController = TextEditingController();
@@ -55,13 +54,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xFFeb5f00),
         body: header(),
       ),
     );
   }
 
-  @override
   Widget header() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,13 +88,14 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(
-                        25.sp,
+                        50.sp,
                       ),
-                      topRight: Radius.circular(25.sp))),
+                      topRight: Radius.circular(50.sp))),
               child: Form(
                 key: formKey,
                 child: Column(
                   children: [
+                    Gap(5.h),
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 3.w, vertical: 5.h),
@@ -114,16 +114,26 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           children: [
                             CustomForm(
-                              validator: (value) {},
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "Email or phone no is required";
+                                }
+                                return null;
+                              },
                               hintText: 'Email or phone number',
                               controller: emailController,
                             ),
                             const Divider(
-                              thickness: 0.6,
+                              thickness: 0.2,
                               color: Colors.black54,
                             ),
                             CustomForm(
-                              validator: (value) {},
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "password is required";
+                                }
+                                return null;
+                              },
                               hintText: 'Enter the password',
                               controller: passController,
                             ),
@@ -142,12 +152,23 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.w600),
                         )),
                     Gap(2.h),
-                    CustomButton(
-                      text: "Login",
-                      ontab: () async {
-                        await authData();
-                      },
-                    ),
+                    isLoading == false
+                        ? CustomButton(
+                            text: "Login",
+                            ontab: () async {
+                              if (formKey.currentState!.validate()) {
+                                await loginwithEmail();
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => HomeScreen(
+                                          email: emailController.text,
+                                          password: passController.text,
+                                        )));
+                              }
+                            },
+                          )
+                        : const CircularProgressIndicator(
+                            color: Color(0xFFeb5f00),
+                          ),
                     Gap(6.h),
                     Text(
                       "Continue With Social Media",
