@@ -8,6 +8,8 @@ import 'package:firebase_authentication/views/widgets/custom_button.dart';
 import 'package:firebase_authentication/views/screens/home_screen/home_screen.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -20,11 +22,27 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> loginwithEmail() async {
     try {
-      UserCredential userData = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passController.text.trim());
-      if (userData.credential!.accessToken!.isNotEmpty) {}
+      UserCredential userData =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passController.text.trim(),
+      );
+      print({
+        'name': userData.user!.displayName,
+        'email': userData.user!.email,
+        'phno': userData.user!.phoneNumber
+      });
+      if (userData.user != null) {
+        setState(() {
+          isLoading = !isLoading;
+        });
+        await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            email: emailController.text,
+            password: passController.text,
+          ),
+        ));
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == "weak-password") {
         print('The password provided is too weak.');
@@ -54,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: const Color(0xFFeb5f00),
         body: header(),
       ),
@@ -62,40 +79,40 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 30.sp, left: 10.sp),
-          child: Text("Login",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 30.sp)),
-        ),
-        Padding(
-          padding: EdgeInsets.only(left: 10.sp),
-          child: Text("Welcome Back",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20.sp)),
-        ),
-        Gap(8.h),
-        Expanded(
-          child: Container(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 30.sp, left: 10.sp),
+            child: Text("Login",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 30.sp)),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 10.sp),
+            child: Text("Welcome Back",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20.sp)),
+          ),
+          Gap(8.h),
+          Container(
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(
-                        50.sp,
+                        20.sp,
                       ),
-                      topRight: Radius.circular(50.sp))),
+                      topRight: Radius.circular(20.sp))),
               child: Form(
                 key: formKey,
                 child: Column(
                   children: [
-                    Gap(5.h),
+                    Gap(2.h),
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 3.w, vertical: 5.h),
@@ -152,23 +169,27 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.w600),
                         )),
                     Gap(2.h),
-                    isLoading == false
-                        ? CustomButton(
-                            text: "Login",
-                            ontab: () async {
-                              if (formKey.currentState!.validate()) {
-                                await loginwithEmail();
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => HomeScreen(
-                                          email: emailController.text,
-                                          password: passController.text,
-                                        )));
-                              }
-                            },
-                          )
-                        : const CircularProgressIndicator(
-                            color: Color(0xFFeb5f00),
-                          ),
+                    CustomButton(
+                      item: !isLoading
+                           ? Text(
+                              'Login',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w500),
+                            )
+                          : const CircularProgressIndicator(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                            ),
+                      ontab: () async {
+                        if (formKey.currentState!.validate()) {
+                          setState(() {
+                            isLoading = !isLoading;
+                          });
+                          await loginwithEmail();
+                        }
+                      },
+                    ),
                     Gap(6.h),
                     Text(
                       "Continue With Social Media",
@@ -182,12 +203,13 @@ class _LoginPageState extends State<LoginPage> {
                         width: 80.w,
                         backgroundColor: Colors.white,
                         buttonType: SocialLoginButtonType.google,
-                        onPressed: () {})
+                        onPressed: () {}),
+                    Gap(12.h),
                   ],
                 ),
-              )),
-        )
-      ],
+              ))
+        ],
+      ),
     );
   }
 }

@@ -2,9 +2,9 @@ import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
-  final String text;
+  final Widget item;
   final Function()? ontab;
-  const CustomButton({super.key, required this.text, required this.ontab});
+  const CustomButton({super.key, required this.item, required this.ontab});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +14,6 @@ class CustomButton extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: 19.w, vertical: 1.5.h)),
             backgroundColor: const MaterialStatePropertyAll(Color(0xFFeb5f00))),
         onPressed: ontab,
-        child: Text(
-          text,
-          style: TextStyle(
-              color: Colors.white,
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w500),
-        ));
+        child:item );
   }
 }
